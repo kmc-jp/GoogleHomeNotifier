@@ -5,43 +5,43 @@ package voicevox
 
 import (
 	"fmt"
+	"plugin"
 	"strings"
-	"syscall"
 	"unsafe"
 )
 
-var voicevoxcoredll = syscall.MustLoadDLL(`voicevox_core.dll`)
+var voicevoxcoreso = plugin.Open(`libvoicevox_core.so`)
 
 var (
-	make_default_initialize_options_proc  = voicevoxcoredll.MustFindProc("voicevox_make_default_initialize_options")
-	initialize_proc                       = voicevoxcoredll.MustFindProc("voicevox_initialize")
-	get_version_proc                      = voicevoxcoredll.MustFindProc("voicevox_get_version")
-	load_model_proc                       = voicevoxcoredll.MustFindProc("voicevox_load_model")
-	is_gpu_mode_proc                      = voicevoxcoredll.MustFindProc("voicevox_is_gpu_mode")
-	is_model_loaded_proc                  = voicevoxcoredll.MustFindProc("voicevox_is_model_loaded")
-	finalize_proc                         = voicevoxcoredll.MustFindProc("voicevox_finalize")
-	get_metas_json_proc                   = voicevoxcoredll.MustFindProc("voicevox_get_metas_json")
-	get_supported_devices_json_proc       = voicevoxcoredll.MustFindProc("voicevox_get_supported_devices_json")
-	predict_duration_proc                 = voicevoxcoredll.MustFindProc("voicevox_predict_duration")
-	predict_duration_data_free_proc       = voicevoxcoredll.MustFindProc("voicevox_predict_duration_data_free")
-	predict_intonation_proc               = voicevoxcoredll.MustFindProc("voicevox_predict_intonation")
-	predict_intonation_data_free_proc     = voicevoxcoredll.MustFindProc("voicevox_predict_intonation_data_free")
-	decode_proc                           = voicevoxcoredll.MustFindProc("voicevox_decode")
-	decode_data_free_proc                 = voicevoxcoredll.MustFindProc("voicevox_decode_data_free")
-	make_default_audio_query_options_proc = voicevoxcoredll.MustFindProc("voicevox_make_default_audio_query_options")
-	audio_query_proc                      = voicevoxcoredll.MustFindProc("voicevox_audio_query")
-	make_default_synthesis_options_proc   = voicevoxcoredll.MustFindProc("voicevox_make_default_synthesis_options")
-	synthesis_proc                        = voicevoxcoredll.MustFindProc("voicevox_synthesis")
-	make_default_tts_options_proc         = voicevoxcoredll.MustFindProc("voicevox_make_default_tts_options")
-	tts_proc                              = voicevoxcoredll.MustFindProc("voicevox_tts")
-	audio_query_json_free_proc            = voicevoxcoredll.MustFindProc("voicevox_audio_query_json_free")
-	wav_free_proc                         = voicevoxcoredll.MustFindProc("voicevox_wav_free")
-	error_result_to_message_proc          = voicevoxcoredll.MustFindProc("voicevox_error_result_to_message")
+	make_default_initialize_options_proc, _  = voicevoxcoreso.Lookup("voicevox_make_default_initialize_options")
+	initialize_proc, _                       = voicevoxcoreso.Lookup("voicevox_initialize")
+	get_version_proc, _                      = voicevoxcoreso.Lookup("voicevox_get_version")
+	load_model_proc, _                       = voicevoxcoreso.Lookup("voicevox_load_model")
+	is_gpu_mode_proc, _                      = voicevoxcoreso.Lookup("voicevox_is_gpu_mode")
+	is_model_loaded_proc, _                  = voicevoxcoreso.Lookup("voicevox_is_model_loaded")
+	finalize_proc, _                         = voicevoxcoreso.Lookup("voicevox_finalize")
+	get_metas_json_proc, _                   = voicevoxcoreso.Lookup("voicevox_get_metas_json")
+	get_supported_devices_json_proc, _       = voicevoxcoreso.Lookup("voicevox_get_supported_devices_json")
+	predict_duration_proc, _                 = voicevoxcoreso.Lookup("voicevox_predict_duration")
+	predict_duration_data_free_proc, _       = voicevoxcoreso.Lookup("voicevox_predict_duration_data_free")
+	predict_intonation_proc, _               = voicevoxcoreso.Lookup("voicevox_predict_intonation")
+	predict_intonation_data_free_proc, _     = voicevoxcoreso.Lookup("voicevox_predict_intonation_data_free")
+	decode_proc, _                           = voicevoxcoreso.Lookup("voicevox_decode")
+	decode_data_free_proc, _                 = voicevoxcoreso.Lookup("voicevox_decode_data_free")
+	make_default_audio_query_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_audio_query_options")
+	audio_query_proc, _                      = voicevoxcoreso.Lookup("voicevox_audio_query")
+	make_default_synthesis_options_proc, _   = voicevoxcoreso.Lookup("voicevox_make_default_synthesis_options")
+	synthesis_proc, _                        = voicevoxcoreso.Lookup("voicevox_synthesis")
+	make_default_tts_options_proc, _         = voicevoxcoreso.Lookup("voicevox_make_default_tts_options")
+	tts_proc, _                              = voicevoxcoreso.Lookup("voicevox_tts")
+	audio_query_json_free_proc, _            = voicevoxcoreso.Lookup("voicevox_audio_query_json_free")
+	wav_free_proc, _                         = voicevoxcoreso.Lookup("voicevox_wav_free")
+	error_result_to_message_proc, _          = voicevoxcoreso.Lookup("voicevox_error_result_to_message")
 )
 
 // Problem: Program crashes when this function was called
 // func MakeDefaultInitializeOptions() VoicevoxInitializeOptions {
-// 	r1, _, _ := make_default_initialize_options_proc.Call()
+// 	r1 := make_default_initialize_options_proc.(func())()
 // 	return *(*VoicevoxInitializeOptions)(unsafe.Pointer(&r1))
 // }
 
@@ -58,7 +58,7 @@ func Initialize(options VoicevoxInitializeOptions) error {
 		OpenJtalkDictDir: append([]byte(options.OpenJtalkDictDir), 0x00),
 	}
 
-	r1, _, _ := initialize_proc.Call(uintptr(unsafe.Pointer(&conv_options.AccelerationMode)))
+	r1 := initialize_proc.(func(uintptr) ResultCode)(uintptr(unsafe.Pointer(&conv_options.AccelerationMode)))
 	if r1 != 0 {
 		return fmt.Errorf(ErrorResultToMessage(ResultCode(r1)))
 	}
@@ -66,12 +66,12 @@ func Initialize(options VoicevoxInitializeOptions) error {
 }
 
 func GetVersion() string {
-	r1, _, _ := get_version_proc.Call()
+	r1 := get_version_proc.(func() uintptr)()
 	return UTF8PtrToString((*byte)(unsafe.Pointer(r1)))
 }
 
 func LoadModel(speaker_id uint32) error {
-	r1, _, _ := load_model_proc.Call(uintptr(speaker_id))
+	r1 := load_model_proc.(func(uint32) ResultCode)(speaker_id)
 	if r1 != 0 {
 		return fmt.Errorf(ErrorResultToMessage(ResultCode(r1)))
 	}
@@ -79,26 +79,26 @@ func LoadModel(speaker_id uint32) error {
 }
 
 func IsGPUMode() bool {
-	r1, _, _ := is_gpu_mode_proc.Call()
-	return r1 == 1
+	r1 := is_gpu_mode_proc.(func() bool)()
+	return r1
 }
 
 func IsModelLoaded(speaker_id uint32) bool {
-	r1, _, _ := is_model_loaded_proc.Call(uintptr(speaker_id))
-	return r1 == 1
+	r1 := is_model_loaded_proc.(func(uint32) bool)(speaker_id)
+	return r1
 }
 
 func Finalize() {
-	finalize_proc.Call()
+	finalize_proc.(func())()
 }
 
 func GetMetasJson() string {
-	r1, _, _ := get_metas_json_proc.Call()
+	r1 := get_metas_json_proc.(func() uintptr)()
 	return UTF8PtrToString((*byte)(unsafe.Pointer(r1)))
 }
 
 func GetSupportedDevicesJson() string {
-	r1, _, _ := get_supported_devices_json_proc.Call()
+	r1 := get_supported_devices_json_proc.(func() uintptr)()
 	return UTF8PtrToString((*byte)(unsafe.Pointer(r1)))
 }
 
@@ -111,10 +111,10 @@ func PredictDuration(
 	if len(phoneme_vector) == 0 {
 		return nil, fmt.Errorf("invalid PhonemeVector size")
 	}
-	r1, _, _ := predict_duration_proc.Call(
+	r1 := predict_duration_proc.(func(uintptr, uintptr, uint32, uintptr, uintptr) ResultCode)(
 		uintptr(len(phoneme_vector)),
 		uintptr(unsafe.Pointer(&phoneme_vector[0])),
-		uintptr(speaker_id),
+		speaker_id,
 		uintptr(unsafe.Pointer(&output_predict_duration_data_length)),
 		uintptr(unsafe.Pointer(&output_predict_duration_data)),
 	)
@@ -134,7 +134,7 @@ func PredictDuration(
 }
 
 func predictDurationDataFree(durations []float32) {
-	predict_duration_data_free_proc.Call(uintptr(unsafe.Pointer(&durations[0])))
+	predict_duration_data_free_proc.(func(uintptr))(uintptr(unsafe.Pointer(&durations[0])))
 }
 
 func PredictIntonation(
@@ -148,7 +148,18 @@ func PredictIntonation(
 ) (intonations []float32, err error) {
 	var output_predict_intonation_data_length uintptr
 	var output_predict_intonation_data *float32
-	r1, _, _ := predict_intonation_proc.Call(
+	r1 := predict_intonation_proc.(func(
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+	) ResultCode)(
 		uintptr(len(vowel_phoneme_vector)),
 		uintptr(unsafe.Pointer(&vowel_phoneme_vector[0])),
 		uintptr(unsafe.Pointer(&consonant_phoneme_vector[0])),
@@ -175,7 +186,7 @@ func PredictIntonation(
 }
 
 func predictIntonationDataFree(intonations []float32) {
-	predict_intonation_data_free_proc.Call(uintptr(unsafe.Pointer(&intonations[0])))
+	predict_intonation_data_free_proc.(func(uintptr))(uintptr(unsafe.Pointer(&intonations[0])))
 }
 
 func Decode(
@@ -188,7 +199,15 @@ func Decode(
 
 	var output_decode_data_length uintptr
 	var output_decode_data *float32
-	r1, _, _ := decode_proc.Call(
+	r1 := decode_proc.(func(
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+	) ResultCode)(
 		uintptr(length),
 		uintptr(phoneme_size),
 		uintptr(unsafe.Pointer(&f0[0])),
@@ -212,7 +231,7 @@ func Decode(
 }
 
 func decodeDataFree(decode_data []float32) {
-	decode_data_free_proc.Call(uintptr(unsafe.Pointer(&decode_data[0])))
+	decode_data_free_proc.(func(uintptr))(uintptr(unsafe.Pointer(&decode_data[0])))
 }
 
 // TODO: implement voicevox_make_default_audio_query_options
@@ -224,7 +243,12 @@ func AudioQuery(
 ) (string, error) {
 	var rawoutput string
 	var conv_text = append([]byte(text), 0x00)
-	r1, _, _ := audio_query_proc.Call(
+	r1 := audio_query_proc.(func(
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+	) ResultCode)(
 		uintptr(unsafe.Pointer(&conv_text[0])),
 		uintptr(speaker_id),
 		uintptr(unsafe.Pointer(&options.Kana)),
@@ -249,7 +273,13 @@ func Synthesis(
 ) ([]byte, error) {
 	var output_wav *byte
 	var output_wav_length uintptr
-	r1, _, _ := synthesis_proc.Call(
+	r1 := synthesis_proc.(func(
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+	) ResultCode)(
 		uintptr(unsafe.Pointer(&audio_query)),
 		uintptr(speaker_id),
 		uintptr(unsafe.Pointer(&options.EnableInterrogativeUpspeak)),
@@ -272,7 +302,13 @@ func TTS(
 	var output_wav *byte
 	var output_wav_length uintptr
 	var conv_text = append([]byte(text), 0x00)
-	r1, _, _ := tts_proc.Call(
+	r1 := tts_proc.(func(
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+		uintptr,
+	) ResultCode)(
 		uintptr(unsafe.Pointer(&conv_text[0])),
 		uintptr(speaker_id),
 		uintptr(unsafe.Pointer(&options.Kana)),
@@ -288,15 +324,15 @@ func TTS(
 }
 
 func audioQueryJsonFree(audioQueryJson string) {
-	audio_query_json_free_proc.Call(uintptr(unsafe.Pointer(&audioQueryJson)))
+	audio_query_json_free_proc.(func(uintptr))(uintptr(unsafe.Pointer(&audioQueryJson)))
 }
 
 func WavFree(output_wav []byte) {
-	wav_free_proc.Call(uintptr(unsafe.Pointer(&output_wav[0])))
+	wav_free_proc.(func(uintptr))(uintptr(unsafe.Pointer(&output_wav[0])))
 }
 
 func ErrorResultToMessage(result ResultCode) string {
-	r1, _, _ := error_result_to_message_proc.Call(uintptr(result))
+	r1 := error_result_to_message_proc.(func(uintptr))(uintptr(result))
 	return UTF8PtrToString((*byte)(unsafe.Pointer(r1)))
 }
 
