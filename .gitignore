@@ -1,0 +1,8 @@
+model/
+open_jtalk_dic_utf_8-1.11/
+*.exe
+*.dll
+VERSION
+README.txt
+*.lib
+*.h
