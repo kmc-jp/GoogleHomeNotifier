@@ -44,6 +44,8 @@ func main() {
 			continue
 		}
 
+		os.Remove(sound.FilePath)
+
 		fmt.Println("Input text...")
 	}
 }
