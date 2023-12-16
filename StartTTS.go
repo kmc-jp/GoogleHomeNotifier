@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 
 	"github.com/TKMAX777/GoogleHomeNotifier/voicevox"
@@ -45,7 +44,6 @@ func StartTTS(speakerID uint32) (chan string, chan TtsOutputAttr, error) {
 				outputchan <- TtsOutputAttr{Error: fmt.Errorf("TTS: %v", err)}
 				continue
 			}
-			defer voicevox.WavFree(output)
 
 			f, err := os.CreateTemp("", "GoogleHomeSound*.wav")
 			if err != nil {
@@ -56,7 +54,9 @@ func StartTTS(speakerID uint32) (chan string, chan TtsOutputAttr, error) {
 			f.Write(output)
 			f.Close()
 
-			outputchan <- TtsOutputAttr{FilePath: filepath.Join(os.TempDir(), f.Name())}
+			voicevox.WavFree(output)
+
+			outputchan <- TtsOutputAttr{FilePath: f.Name()}
 		}
 	}()
 
