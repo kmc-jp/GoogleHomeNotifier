@@ -184,10 +184,10 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 	rawDecode_data := (*float32)(unsafe.Pointer(cOutputDecodeData))
 
 	var decode_data = make([]float32, lengthGo)
-	copy(decode_data, unsafe.Slice(rawDecode_data, legnthGo))
+	copy(decode_data, unsafe.Slice(rawDecode_data, lengthGo))
 	decodeDataFree(rawDecode_data)
 
-	return outputDecodeData, nil
+	return decode_data, nil
 }
 
 func decodeDataFree(decodeData *float32) {
