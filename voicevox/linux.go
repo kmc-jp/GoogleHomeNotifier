@@ -10,33 +10,33 @@ import (
 	"unsafe"
 )
 
-var voicevoxcoreso = plugin.Open(`libvoicevox_core.so`)
+var voicevoxcoreso *plugin.Plugin
 
 var (
-	make_default_initialize_options_proc, _  = voicevoxcoreso.Lookup("voicevox_make_default_initialize_options")
-	initialize_proc, _                       = voicevoxcoreso.Lookup("voicevox_initialize")
-	get_version_proc, _                      = voicevoxcoreso.Lookup("voicevox_get_version")
-	load_model_proc, _                       = voicevoxcoreso.Lookup("voicevox_load_model")
-	is_gpu_mode_proc, _                      = voicevoxcoreso.Lookup("voicevox_is_gpu_mode")
-	is_model_loaded_proc, _                  = voicevoxcoreso.Lookup("voicevox_is_model_loaded")
-	finalize_proc, _                         = voicevoxcoreso.Lookup("voicevox_finalize")
-	get_metas_json_proc, _                   = voicevoxcoreso.Lookup("voicevox_get_metas_json")
-	get_supported_devices_json_proc, _       = voicevoxcoreso.Lookup("voicevox_get_supported_devices_json")
-	predict_duration_proc, _                 = voicevoxcoreso.Lookup("voicevox_predict_duration")
-	predict_duration_data_free_proc, _       = voicevoxcoreso.Lookup("voicevox_predict_duration_data_free")
-	predict_intonation_proc, _               = voicevoxcoreso.Lookup("voicevox_predict_intonation")
-	predict_intonation_data_free_proc, _     = voicevoxcoreso.Lookup("voicevox_predict_intonation_data_free")
-	decode_proc, _                           = voicevoxcoreso.Lookup("voicevox_decode")
-	decode_data_free_proc, _                 = voicevoxcoreso.Lookup("voicevox_decode_data_free")
-	make_default_audio_query_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_audio_query_options")
-	audio_query_proc, _                      = voicevoxcoreso.Lookup("voicevox_audio_query")
-	make_default_synthesis_options_proc, _   = voicevoxcoreso.Lookup("voicevox_make_default_synthesis_options")
-	synthesis_proc, _                        = voicevoxcoreso.Lookup("voicevox_synthesis")
-	make_default_tts_options_proc, _         = voicevoxcoreso.Lookup("voicevox_make_default_tts_options")
-	tts_proc, _                              = voicevoxcoreso.Lookup("voicevox_tts")
-	audio_query_json_free_proc, _            = voicevoxcoreso.Lookup("voicevox_audio_query_json_free")
-	wav_free_proc, _                         = voicevoxcoreso.Lookup("voicevox_wav_free")
-	error_result_to_message_proc, _          = voicevoxcoreso.Lookup("voicevox_error_result_to_message")
+	make_default_initialize_options_proc  plugin.Symbol
+	initialize_proc                       plugin.Symbol
+	get_version_proc                      plugin.Symbol
+	load_model_proc                       plugin.Symbol
+	is_gpu_mode_proc                      plugin.Symbol
+	is_model_loaded_proc                  plugin.Symbol
+	finalize_proc                         plugin.Symbol
+	get_metas_json_proc                   plugin.Symbol
+	get_supported_devices_json_proc       plugin.Symbol
+	predict_duration_proc                 plugin.Symbol
+	predict_duration_data_free_proc       plugin.Symbol
+	predict_intonation_proc               plugin.Symbol
+	predict_intonation_data_free_proc     plugin.Symbol
+	decode_proc                           plugin.Symbol
+	decode_data_free_proc                 plugin.Symbol
+	make_default_audio_query_options_proc plugin.Symbol
+	audio_query_proc                      plugin.Symbol
+	make_default_synthesis_options_proc   plugin.Symbol
+	synthesis_proc                        plugin.Symbol
+	make_default_tts_options_proc         plugin.Symbol
+	tts_proc                              plugin.Symbol
+	audio_query_json_free_proc            plugin.Symbol
+	wav_free_proc                         plugin.Symbol
+	error_result_to_message_proc          plugin.Symbol
 )
 
 // Problem: Program crashes when this function was called
@@ -46,6 +46,37 @@ var (
 // }
 
 func Initialize(options VoicevoxInitializeOptions) error {
+	var err error
+	voicevoxcoreso, err = plugin.Open(`libvoicevox_core.so`)
+	if err != nil {
+		panic("libvoicevox_core.so not found")
+	}
+
+	make_default_initialize_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_initialize_options")
+	initialize_proc, _ = voicevoxcoreso.Lookup("voicevox_initialize")
+	get_version_proc, _ = voicevoxcoreso.Lookup("voicevox_get_version")
+	load_model_proc, _ = voicevoxcoreso.Lookup("voicevox_load_model")
+	is_gpu_mode_proc, _ = voicevoxcoreso.Lookup("voicevox_is_gpu_mode")
+	is_model_loaded_proc, _ = voicevoxcoreso.Lookup("voicevox_is_model_loaded")
+	finalize_proc, _ = voicevoxcoreso.Lookup("voicevox_finalize")
+	get_metas_json_proc, _ = voicevoxcoreso.Lookup("voicevox_get_metas_json")
+	get_supported_devices_json_proc, _ = voicevoxcoreso.Lookup("voicevox_get_supported_devices_json")
+	predict_duration_proc, _ = voicevoxcoreso.Lookup("voicevox_predict_duration")
+	predict_duration_data_free_proc, _ = voicevoxcoreso.Lookup("voicevox_predict_duration_data_free")
+	predict_intonation_proc, _ = voicevoxcoreso.Lookup("voicevox_predict_intonation")
+	predict_intonation_data_free_proc, _ = voicevoxcoreso.Lookup("voicevox_predict_intonation_data_free")
+	decode_proc, _ = voicevoxcoreso.Lookup("voicevox_decode")
+	decode_data_free_proc, _ = voicevoxcoreso.Lookup("voicevox_decode_data_free")
+	make_default_audio_query_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_audio_query_options")
+	audio_query_proc, _ = voicevoxcoreso.Lookup("voicevox_audio_query")
+	make_default_synthesis_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_synthesis_options")
+	synthesis_proc, _ = voicevoxcoreso.Lookup("voicevox_synthesis")
+	make_default_tts_options_proc, _ = voicevoxcoreso.Lookup("voicevox_make_default_tts_options")
+	tts_proc, _ = voicevoxcoreso.Lookup("voicevox_tts")
+	audio_query_json_free_proc, _ = voicevoxcoreso.Lookup("voicevox_audio_query_json_free")
+	wav_free_proc, _ = voicevoxcoreso.Lookup("voicevox_wav_free")
+	error_result_to_message_proc, _ = voicevoxcoreso.Lookup("voicevox_error_result_to_message")
+
 	var conv_options = struct {
 		AccelerationMode VoicevoxAccelerationMode
 		CpuNumThreads    uint16
@@ -332,7 +363,7 @@ func WavFree(output_wav []byte) {
 }
 
 func ErrorResultToMessage(result ResultCode) string {
-	r1 := error_result_to_message_proc.(func(uintptr))(uintptr(result))
+	r1 := error_result_to_message_proc.(func(uintptr) uintptr)(uintptr(result))
 	return UTF8PtrToString((*byte)(unsafe.Pointer(r1)))
 }
 
