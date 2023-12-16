@@ -37,8 +37,7 @@ func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan Tts
 	var outputchan = make(chan TtsOutputAttr, 0)
 
 	go func() {
-		for {
-			text := <-inputchan
+		for text := range inputchan {
 			output, err := voicevox.TTS(text, 3, voicevox.VoicevoxTtsOptions{Kana: false})
 			if err != nil {
 				outputchan <- TtsOutputAttr{Error: fmt.Errorf("TTS: %v", err)}

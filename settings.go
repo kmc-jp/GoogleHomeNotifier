@@ -13,6 +13,7 @@ import (
 type Setting struct {
 	Voicevox   VoicevoxSetting   `yaml:"Voicevox"`
 	GoogleHome GoogleHomeSetting `yaml:"GoogleHome"`
+	Slack      SlackSetting      `yaml:"Slack"`
 }
 
 type VoicevoxSetting struct {
@@ -29,6 +30,12 @@ type GoogleHomeSetting struct {
 	Addr        string `yaml:"Addr"`
 	Port        int    `yaml:"Port"`
 	UUID        string `yaml:"UUID"`
+}
+
+type SlackSetting struct {
+	Token         string `yaml:"Token"`
+	AppLevelToken string `yaml:"AppLevelToken"`
+	Icon          string `yaml:"Icon"`
 }
 
 func ReadSettings() (*Setting, error) {

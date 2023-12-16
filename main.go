@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -22,10 +21,10 @@ func main() {
 		return
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("Input text...")
-	for scanner.Scan() {
-		text := strings.TrimSpace(scanner.Text())
+	slacktextchan, slackdonechan := StartSlack(settings.Slack)
+
+	for text := range slacktextchan {
+		text = strings.TrimSpace(text)
 		if text == "" {
 			continue
 		}
@@ -46,6 +45,6 @@ func main() {
 
 		os.Remove(sound.FilePath)
 
-		fmt.Println("Input text...")
+		slackdonechan <- true
 	}
 }
