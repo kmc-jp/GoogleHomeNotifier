@@ -4,7 +4,9 @@
 package voicevox
 
 /*
-#cgo LDFLAGS: -L. -lvoicevox_core
+#cgo LDFLAGS: -L../ -lvoicevox_core
+#cgo CFLAGS: -I../
+#include <stdlib.h>
 #include "voicevox_core.h"
 */
 import "C"
@@ -275,5 +277,5 @@ func WavFree(wav *uint8) {
 }
 
 func ErrorResultToMessage(resultCode ResultCode) string {
-	return C.GoString(C.voicevox_error_result_to_message(C.ResultCode(resultCode)))
+	return C.GoString(C.voicevox_error_result_to_message(C.VoicevoxResultCode(resultCode)))
 }
