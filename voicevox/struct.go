@@ -46,6 +46,10 @@ type VoicevoxTtsOptions struct {
 	 * aquestalk形式のkanaとしてテキストを解釈する
 	 */
 	Kana bool
+	/**
+	 * 疑問文の調整を有効にする
+	 */
+	EnableInterrogativeUpspeak bool
 }
 
 type VoicevoxUserDictWord struct{}

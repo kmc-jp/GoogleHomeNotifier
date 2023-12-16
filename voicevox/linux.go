@@ -69,7 +69,7 @@ func PredictDuration(phonemeVector []int64, speakerID uint32) (ResultCode, []flo
 		&cOutputPredictDurationData,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_predict_duration failed: %d", resultCode)
 	}
 
@@ -114,7 +114,7 @@ func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVe
 		&cOutputPredictIntonationData,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_predict_intonation failed: %d", resultCode)
 	}
 
@@ -151,7 +151,7 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 		&cOutputDecodeData,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_decode failed: %d", resultCode)
 	}
 
@@ -187,7 +187,7 @@ func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions
 		&cOutputAudioQueryJSON,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), "", fmt.Errorf("voicevox_audio_query failed: %d", resultCode)
 	}
 
@@ -197,8 +197,8 @@ func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions
 	return ResultCode(resultCode), outputAudioQueryJSON, nil
 }
 
-func AudioQueryJSONFree(audioQueryJSON *char) {
-	C.voicevox_audio_query_json_free((*C.char)(audioQueryJSON))
+func AudioQueryJSONFree(audioQueryJSON *C.char) {
+	C.voicevox_audio_query_json_free(audioQueryJSON)
 }
 
 func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesisOptions) (ResultCode, []byte, error) {
@@ -220,7 +220,7 @@ func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesi
 		&cOutputWav,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_synthesis failed: %d", resultCode)
 	}
 
@@ -256,7 +256,7 @@ func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) (ResultCode,
 		&cOutputWav,
 	)
 
-	if resultCode != RESULT_OK {
+	if resultCode != C.int(RESULT_OK) {
 		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_tts failed: %d", resultCode)
 	}
 
