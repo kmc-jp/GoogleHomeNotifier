@@ -13,7 +13,7 @@ type TtsOutputAttr struct {
 	Error    error
 }
 
-func StartTTS(speakerID uint32) (chan string, chan TtsOutputAttr, error) {
+func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan TtsOutputAttr, error) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 

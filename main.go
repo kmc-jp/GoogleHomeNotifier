@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	ttsinput, ttsoutput, err := StartTTS(settings.Voicevox.SpeakerID)
+	ttsinput, ttsoutput, err := StartTTS(settings.Voicevox.SpeakerID, settings.Voicevox)
 	if err != nil {
 		fmt.Println("Failed to StartTTS.", err)
 		return
