@@ -46,6 +46,13 @@ func StartSlack(settings SlackSetting) (chan string, chan bool) {
 				case slackevents.CallbackEvent:
 					switch evi := evp.InnerEvent.Data.(type) {
 					case *slackevents.AppMentionEvent:
+						_, ts, _, _ := slackAPI.SendMessage(
+							evi.Channel,
+							slack.MsgOptionAsUser(false),
+							slack.MsgOptionIconEmoji(settings.Icon),
+							slack.MsgOptionText("OK, wait a moment...", false),
+						)
+
 						text := strings.ReplaceAll(evi.Text, fmt.Sprintf("<@%s>", botinfo.BotID), "")
 
 						matchstrings := useridRegexp.FindAllStringSubmatch(text, -1)
@@ -63,8 +70,9 @@ func StartSlack(settings SlackSetting) (chan string, chan bool) {
 						output <- text
 						<-donechan
 
-						slackAPI.SendMessage(
+						slackAPI.UpdateMessage(
 							evi.Channel,
+							ts,
 							slack.MsgOptionAsUser(false),
 							slack.MsgOptionIconEmoji(settings.Icon),
 							slack.MsgOptionText("Message was successfully sent.", false),

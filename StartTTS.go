@@ -32,9 +32,9 @@ func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan Tts
 		return nil, nil, fmt.Errorf("LoadModel: %v", err)
 	}
 
-	var inputchan = make(chan string, 0)
+	var inputchan = make(chan string)
 
-	var outputchan = make(chan TtsOutputAttr, 0)
+	var outputchan = make(chan TtsOutputAttr)
 
 	go func() {
 		for text := range inputchan {
