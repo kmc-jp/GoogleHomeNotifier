@@ -16,7 +16,8 @@ type Setting struct {
 }
 
 type VoicevoxSetting struct {
-	SpeakerID uint32 `yaml:"SpeakerID"`
+	SpeakerID        uint32 `yaml:"SpeakerID"`
+	OpenJtalkDictDir string `yaml:"OpenJtalkDictDir"`
 }
 
 type GoogleHomeSetting struct {
