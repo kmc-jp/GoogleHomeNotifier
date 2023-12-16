@@ -5,6 +5,7 @@ go 1.21.4
 require (
 	github.com/goccy/go-yaml v1.11.2
 	github.com/pkg/errors v0.9.1
+	github.com/slack-go/slack v0.12.3
 	github.com/vishen/go-chromecast v0.3.1
 )
 
@@ -13,6 +14,7 @@ require (
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/h2non/filetype v1.1.3 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect

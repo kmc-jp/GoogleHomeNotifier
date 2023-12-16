@@ -23,6 +23,8 @@ func main() {
 
 	slacktextchan, slackdonechan := StartSlack(settings.Slack)
 
+	fmt.Println("Start waiting messages...")
+
 	for text := range slacktextchan {
 		text = strings.TrimSpace(text)
 		if text == "" {
