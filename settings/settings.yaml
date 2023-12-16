@@ -8,3 +8,7 @@ Voicevox:
   SpeakerID: 3
   OpenJtalkDictDir: "open_jtalk_dic_utf_8-1.11"
 
+Slack:
+  Token:
+  AppLevelToken: 
+  Icon: 
