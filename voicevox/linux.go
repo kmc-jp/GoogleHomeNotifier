@@ -12,13 +12,12 @@ package voicevox
 import "C"
 import (
 	"fmt"
-	"reflect"
 	"unsafe"
 )
 
 // ここにラッパー関数を定義
 
-func Initialize(options VoicevoxInitializeOptions) ResultCode {
+func Initialize(options VoicevoxInitializeOptions) error {
 	cOptions := C.struct_VoicevoxInitializeOptions{
 		acceleration_mode:   C.VoicevoxAccelerationMode(options.AccelerationMode),
 		cpu_num_threads:     C.uint16_t(options.CpuNumThreads),
@@ -27,15 +26,24 @@ func Initialize(options VoicevoxInitializeOptions) ResultCode {
 	}
 	defer C.free(unsafe.Pointer(cOptions.open_jtalk_dict_dir))
 
-	return ResultCode(C.voicevox_initialize(cOptions))
+	r1 := ResultCode(C.voicevox_initialize(cOptions))
+	if r1 != 0 {
+		return fmt.Errorf(ErrorResultToMessage(r1))
+	}
+
+	return nil
 }
 
 func GetVersion() string {
 	return C.GoString(C.voicevox_get_version())
 }
 
-func LoadModel(speakerID uint32) ResultCode {
-	return ResultCode(C.voicevox_load_model(C.uint32_t(speakerID)))
+func LoadModel(speakerID uint32) error {
+	r1 := ResultCode(C.voicevox_load_model(C.uint32_t(speakerID)))
+	if r1 != 0 {
+		return fmt.Errorf(ErrorResultToMessage(r1))
+	}
+	return nil
 }
 
 func IsGPUMode() bool {
@@ -54,7 +62,7 @@ func GetMetasJSON() string {
 	return C.GoString(C.voicevox_get_metas_json())
 }
 
-func PredictDuration(phonemeVector []int64, speakerID uint32) (ResultCode, []float32, error) {
+func PredictDuration(phonemeVector []int64, speakerID uint32) ([]float32, error) {
 	length := uintptr(len(phonemeVector))
 	cPhonemeVector := (*C.int64_t)(unsafe.Pointer(&phonemeVector[0]))
 
@@ -70,25 +78,31 @@ func PredictDuration(phonemeVector []int64, speakerID uint32) (ResultCode, []flo
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_predict_duration failed: %d", resultCode)
+		return nil, ErrorResultToMessage(ResultCode(resultCode))
 	}
 
 	lengthGo := uint(cOutputPredictDurationDataLength)
-	sliceHeader := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cOutputPredictDurationData)),
-		Len:  int(lengthGo),
-		Cap:  int(lengthGo),
-	}
-	outputPredictDurationData := *(*[]float32)(unsafe.Pointer(&sliceHeader))
 
-	return ResultCode(resultCode), outputPredictDurationData, nil
+	// sliceHeader := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(cOutputPredictDurationData)),
+	// 	Len:  int(lengthGo),
+	// 	Cap:  int(lengthGo),
+	// }
+	outputPredictDurationData := unsafe.Slice((*float32)(unsafe.Pointer(cOutputPredictDurationData)), lengthGo)
+
+	durations := make([]float32, lengthGo)
+	copy(durations, outputPredictDurationData)
+
+	predictDurationDataFree(&outputPredictDurationData[0])
+
+	return durations, nil
 }
 
-func PredictDurationDataFree(predictDurationData *float32) {
+func predictDurationDataFree(predictDurationData *float32) {
 	C.voicevox_predict_duration_data_free((*C.float)(predictDurationData))
 }
 
-func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVector, endAccentVector, startAccentPhraseVector, endAccentPhraseVector []int64, speakerID uint32) (ResultCode, []float32, error) {
+func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVector, endAccentVector, startAccentPhraseVector, endAccentPhraseVector []int64, speakerID uint32) ([]float32, error) {
 	length := uintptr(len(vowelPhonemeVector)) // すべてのベクトルは同じ長さである必要があります
 
 	cVowelPhonemeVector := (*C.int64_t)(unsafe.Pointer(&vowelPhonemeVector[0]))
@@ -115,25 +129,30 @@ func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVe
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_predict_intonation failed: %d", resultCode)
+		return nil, ErrorResultToMessage(ResultCode(resultCode))
 	}
 
 	lengthGo := uint(cOutputPredictIntonationDataLength)
-	sliceHeader := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cOutputPredictIntonationData)),
-		Len:  int(lengthGo),
-		Cap:  int(lengthGo),
-	}
-	outputPredictIntonationData := *(*[]float32)(unsafe.Pointer(&sliceHeader))
+	// sliceHeader := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(cOutputPredictIntonationData)),
+	// 	Len:  int(lengthGo),
+	// 	Cap:  int(lengthGo),
+	// }
+	outputPredictIntonationData := unsafe.Slice((*float32)(unsafe.Pointer(cOutputPredictIntonationData)), lengthGo)
 
-	return ResultCode(resultCode), outputPredictIntonationData, nil
+	intonations := make([]float32, lengthGo)
+	copy(intonations, outputPredictIntonationData)
+
+	predictDurationDataFree(&outputPredictIntonationData[0])
+
+	return outputPredictIntonationData, nil
 }
 
-func PredictIntonationDataFree(predictIntonationData *float32) {
+func predictIntonationDataFree(predictIntonationData *float32) {
 	C.voicevox_predict_intonation_data_free((*C.float)(predictIntonationData))
 }
 
-func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) (ResultCode, []float32, error) {
+func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) ([]float32, error) {
 	length := uintptr(len(f0)) // F0とphonemeVectorは同じ長さである必要があります
 	cF0 := (*C.float)(unsafe.Pointer(&f0[0]))
 	cPhonemeVector := (*C.float)(unsafe.Pointer(&phonemeVector[0]))
@@ -152,25 +171,27 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_decode failed: %d", resultCode)
+		return nil, ErrorResultToMessage(ResultCode(resultCode))
 	}
 
 	lengthGo := uint(cOutputDecodeDataLength)
-	sliceHeader := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cOutputDecodeData)),
-		Len:  int(lengthGo),
-		Cap:  int(lengthGo),
-	}
-	outputDecodeData := *(*[]float32)(unsafe.Pointer(&sliceHeader))
+	// sliceHeader := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(cOutputDecodeData)),
+	// 	Len:  int(lengthGo),
+	// 	Cap:  int(lengthGo),
+	// }
+	var decode_data = make([]float32, lengthGo)
+	copy(decode_data, unsafe.Slice((*float32)(unsafe.Pointer(rawDecode_data)), legnthGo))
+	decodeDataFree(rawDecode_data)
 
-	return ResultCode(resultCode), outputDecodeData, nil
+	return outputDecodeData, nil
 }
 
-func DecodeDataFree(decodeData *float32) {
+func decodeDataFree(decodeData *float32) {
 	C.voicevox_decode_data_free((*C.float)(decodeData))
 }
 
-func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions) (ResultCode, string, error) {
+func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions) (string, error) {
 	cText := C.CString(text)
 	defer C.free(unsafe.Pointer(cText))
 
@@ -188,20 +209,16 @@ func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), "", fmt.Errorf("voicevox_audio_query failed: %d", resultCode)
+		return "", ErrorResultToMessage(ResultCode(resultCode))
 	}
 
 	outputAudioQueryJSON := C.GoString(cOutputAudioQueryJSON)
 	C.voicevox_audio_query_json_free(cOutputAudioQueryJSON)
 
-	return ResultCode(resultCode), outputAudioQueryJSON, nil
+	return outputAudioQueryJSON, nil
 }
 
-func AudioQueryJSONFree(audioQueryJSON *C.char) {
-	C.voicevox_audio_query_json_free(audioQueryJSON)
-}
-
-func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesisOptions) (ResultCode, []byte, error) {
+func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesisOptions) ([]byte, error) {
 	cAudioQueryJSON := C.CString(audioQueryJSON)
 	defer C.free(unsafe.Pointer(cAudioQueryJSON))
 
@@ -221,22 +238,22 @@ func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesi
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_synthesis failed: %d", resultCode)
+		return nil, ErrorResultToMessage(ResultCode(resultCode))
 	}
 
 	lengthGo := uint(cOutputWavLength)
-	sliceHeader := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cOutputWav)),
-		Len:  int(lengthGo),
-		Cap:  int(lengthGo),
-	}
-	outputWav := *(*[]byte)(unsafe.Pointer(&sliceHeader))
+	// sliceHeader := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(cOutputWav)),
+	// 	Len:  int(lengthGo),
+	// 	Cap:  int(lengthGo),
+	// }
+	outputWav := unsafe.Slice((*byte)(unsafe.Pointer(cOutputWavLength)), lengthGo)
 	C.voicevox_wav_free(cOutputWav)
 
-	return ResultCode(resultCode), outputWav, nil
+	return outputWav, nil
 }
 
-func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) (ResultCode, []byte, error) {
+func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) ([]byte, error) {
 	cText := C.CString(text)
 	defer C.free(unsafe.Pointer(cText))
 
@@ -257,22 +274,22 @@ func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) (ResultCode,
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return ResultCode(resultCode), nil, fmt.Errorf("voicevox_tts failed: %d", resultCode)
+		return nil, fmt.Errorf("voicevox_tts failed: %d", resultCode)
 	}
 
 	lengthGo := uint(cOutputWavLength)
-	sliceHeader := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(cOutputWav)),
-		Len:  int(lengthGo),
-		Cap:  int(lengthGo),
-	}
-	outputWav := *(*[]byte)(unsafe.Pointer(&sliceHeader))
-	C.voicevox_wav_free(cOutputWav)
+	// sliceHeader := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(cOutputWav)),
+	// 	Len:  int(lengthGo),
+	// 	Cap:  int(lengthGo),
+	// }
 
-	return ResultCode(resultCode), outputWav, nil
+	outputWav := unsafe.Slice((*byte)(unsafe.Pointer(cOutputWav)), lengthGo)
+
+	return outputWav, nil
 }
 
-func WavFree(wav *uint8) {
+func WavFree(wav *byte) {
 	C.voicevox_wav_free((*C.uint8_t)(wav))
 }
 
