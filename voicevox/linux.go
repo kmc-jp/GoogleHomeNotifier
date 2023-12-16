@@ -296,7 +296,7 @@ func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) ([]byte, err
 }
 
 func WavFree(output_wav []byte) {
-	C.voicevox_wav_free((*C.uint8_t)(&wav[0]))
+	C.voicevox_wav_free((*C.uint8_t)(&output_wav[0]))
 }
 
 func ErrorResultToMessage(resultCode ResultCode) string {
