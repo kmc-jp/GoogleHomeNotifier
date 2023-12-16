@@ -1,0 +1,8 @@
+GoogleHome:
+  Addr: 
+  Port: 
+  Detach: true
+  ForceDetach: true
+
+Voicevox:
+  SpeakerID: 3
