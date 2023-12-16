@@ -180,8 +180,11 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 	// 	Len:  int(lengthGo),
 	// 	Cap:  int(lengthGo),
 	// }
+
+	rawDecode_data := (*float32)(unsafe.Pointer(cOutputDecodeData))
+
 	var decode_data = make([]float32, lengthGo)
-	copy(decode_data, unsafe.Slice((*float32)(unsafe.Pointer(rawDecode_data)), legnthGo))
+	copy(decode_data, unsafe.Slice(rawDecode_data, legnthGo))
 	decodeDataFree(rawDecode_data)
 
 	return outputDecodeData, nil
@@ -247,7 +250,10 @@ func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesi
 	// 	Len:  int(lengthGo),
 	// 	Cap:  int(lengthGo),
 	// }
-	outputWav := unsafe.Slice((*byte)(unsafe.Pointer(cOutputWavLength)), lengthGo)
+
+	rawOutput := (*byte)(unsafe.Pointer(cOutputWav))
+	outputWav := unsafe.Slice(rawOutput, lengthGo)
+
 	C.voicevox_wav_free(cOutputWav)
 
 	return outputWav, nil
@@ -283,8 +289,8 @@ func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) ([]byte, err
 	// 	Len:  int(lengthGo),
 	// 	Cap:  int(lengthGo),
 	// }
-
-	outputWav := unsafe.Slice((*byte)(unsafe.Pointer(cOutputWav)), lengthGo)
+	rawOutput := (*byte)(unsafe.Pointer(cOutputWav))
+	outputWav := unsafe.Slice(rawOutput, lengthGo)
 
 	return outputWav, nil
 }
