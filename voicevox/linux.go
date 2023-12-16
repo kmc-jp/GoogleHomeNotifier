@@ -78,7 +78,7 @@ func PredictDuration(phonemeVector []int64, speakerID uint32) ([]float32, error)
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return nil, ErrorResultToMessage(ResultCode(resultCode))
+		return nil, fmt.Errorf(ErrorResultToMessage(ResultCode(resultCode)))
 	}
 
 	lengthGo := uint(cOutputPredictDurationDataLength)
@@ -129,7 +129,7 @@ func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVe
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return nil, ErrorResultToMessage(ResultCode(resultCode))
+		return nil, fmt.Errorf(ErrorResultToMessage(ResultCode(resultCode)))
 	}
 
 	lengthGo := uint(cOutputPredictIntonationDataLength)
@@ -171,7 +171,7 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return nil, ErrorResultToMessage(ResultCode(resultCode))
+		return nil, fmt.Errorf(ErrorResultToMessage(ResultCode(resultCode)))
 	}
 
 	lengthGo := uint(cOutputDecodeDataLength)
@@ -209,7 +209,7 @@ func AudioQuery(text string, speakerID uint32, options VoicevoxAudioQueryOptions
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return "", ErrorResultToMessage(ResultCode(resultCode))
+		return "", fmt.Errorf(ErrorResultToMessage(ResultCode(resultCode)))
 	}
 
 	outputAudioQueryJSON := C.GoString(cOutputAudioQueryJSON)
@@ -238,7 +238,7 @@ func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesi
 	)
 
 	if resultCode != C.int(RESULT_OK) {
-		return nil, ErrorResultToMessage(ResultCode(resultCode))
+		return nil, fmt.Errorf(ErrorResultToMessage(ResultCode(resultCode)))
 	}
 
 	lengthGo := uint(cOutputWavLength)
