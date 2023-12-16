@@ -62,7 +62,10 @@ func GetMetasJSON() string {
 	return C.GoString(C.voicevox_get_metas_json())
 }
 
-func PredictDuration(phonemeVector []int64, speakerID uint32) ([]float32, error) {
+func PredictDuration(
+	phonemeVector []int64,
+	speakerID uint32,
+) ([]float32, error) {
 	length := uintptr(len(phonemeVector))
 	cPhonemeVector := (*C.int64_t)(unsafe.Pointer(&phonemeVector[0]))
 
@@ -83,11 +86,6 @@ func PredictDuration(phonemeVector []int64, speakerID uint32) ([]float32, error)
 
 	lengthGo := uint(cOutputPredictDurationDataLength)
 
-	// sliceHeader := reflect.SliceHeader{
-	// 	Data: uintptr(unsafe.Pointer(cOutputPredictDurationData)),
-	// 	Len:  int(lengthGo),
-	// 	Cap:  int(lengthGo),
-	// }
 	outputPredictDurationData := unsafe.Slice((*float32)(unsafe.Pointer(cOutputPredictDurationData)), lengthGo)
 
 	durations := make([]float32, lengthGo)
@@ -102,7 +100,15 @@ func predictDurationDataFree(predictDurationData *float32) {
 	C.voicevox_predict_duration_data_free((*C.float)(predictDurationData))
 }
 
-func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVector, endAccentVector, startAccentPhraseVector, endAccentPhraseVector []int64, speakerID uint32) ([]float32, error) {
+func PredictIntonation(
+	vowelPhonemeVector,
+	consonantPhonemeVector,
+	startAccentVector,
+	endAccentVector,
+	startAccentPhraseVector,
+	endAccentPhraseVector []int64,
+	speakerID uint32,
+) ([]float32, error) {
 	length := uintptr(len(vowelPhonemeVector)) // すべてのベクトルは同じ長さである必要があります
 
 	cVowelPhonemeVector := (*C.int64_t)(unsafe.Pointer(&vowelPhonemeVector[0]))
@@ -133,11 +139,6 @@ func PredictIntonation(vowelPhonemeVector, consonantPhonemeVector, startAccentVe
 	}
 
 	lengthGo := uint(cOutputPredictIntonationDataLength)
-	// sliceHeader := reflect.SliceHeader{
-	// 	Data: uintptr(unsafe.Pointer(cOutputPredictIntonationData)),
-	// 	Len:  int(lengthGo),
-	// 	Cap:  int(lengthGo),
-	// }
 	outputPredictIntonationData := unsafe.Slice((*float32)(unsafe.Pointer(cOutputPredictIntonationData)), lengthGo)
 
 	intonations := make([]float32, lengthGo)
@@ -175,12 +176,6 @@ func Decode(f0, phonemeVector []float32, phonemeSize uintptr, speakerID uint32) 
 	}
 
 	lengthGo := uint(cOutputDecodeDataLength)
-	// sliceHeader := reflect.SliceHeader{
-	// 	Data: uintptr(unsafe.Pointer(cOutputDecodeData)),
-	// 	Len:  int(lengthGo),
-	// 	Cap:  int(lengthGo),
-	// }
-
 	rawDecode_data := (*float32)(unsafe.Pointer(cOutputDecodeData))
 
 	var decode_data = make([]float32, lengthGo)
@@ -245,11 +240,6 @@ func Synthesis(audioQueryJSON string, speakerID uint32, options VoicevoxSynthesi
 	}
 
 	lengthGo := uint(cOutputWavLength)
-	// sliceHeader := reflect.SliceHeader{
-	// 	Data: uintptr(unsafe.Pointer(cOutputWav)),
-	// 	Len:  int(lengthGo),
-	// 	Cap:  int(lengthGo),
-	// }
 
 	rawOutput := (*byte)(unsafe.Pointer(cOutputWav))
 	outputWav := unsafe.Slice(rawOutput, lengthGo)
@@ -284,11 +274,7 @@ func TTS(text string, speakerID uint32, options VoicevoxTtsOptions) ([]byte, err
 	}
 
 	lengthGo := uint(cOutputWavLength)
-	// sliceHeader := reflect.SliceHeader{
-	// 	Data: uintptr(unsafe.Pointer(cOutputWav)),
-	// 	Len:  int(lengthGo),
-	// 	Cap:  int(lengthGo),
-	// }
+
 	rawOutput := (*byte)(unsafe.Pointer(cOutputWav))
 	outputWav := unsafe.Slice(rawOutput, lengthGo)
 
