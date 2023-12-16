@@ -35,18 +35,18 @@ func main() {
 		sound := <-ttsoutput
 
 		if sound.Error != nil {
-			fmt.Println("Failed to synthesize sound: ", sound.Error)
+			slackdonechan <- fmt.Errorf("Failed to synthesize sound: %s", sound.Error)
 			continue
 		}
 
 		err = Play(sound.FilePath, settings.GoogleHome)
 		if err != nil {
-			fmt.Println("Failed to play sound: ", err)
+			slackdonechan <- fmt.Errorf("Failed to play sound: %v", err)
 			continue
 		}
 
 		os.Remove(sound.FilePath)
 
-		slackdonechan <- true
+		slackdonechan <- nil
 	}
 }

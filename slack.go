@@ -10,7 +10,7 @@ import (
 	"github.com/slack-go/slack/socketmode"
 )
 
-func StartSlack(settings SlackSetting) (chan string, chan bool) {
+func StartSlack(settings SlackSetting) (chan string, chan error) {
 	slackAPI := slack.New(settings.Token, slack.OptionAppLevelToken(settings.AppLevelToken))
 
 	scm := socketmode.New(slackAPI)
@@ -25,7 +25,7 @@ func StartSlack(settings SlackSetting) (chan string, chan bool) {
 	botinfo, _ := slackAPI.AuthTest()
 
 	var output = make(chan string)
-	var donechan = make(chan bool)
+	var donechan = make(chan error)
 
 	var useridRegexp = regexp.MustCompile(`<@(\S+)>`)
 
@@ -68,7 +68,17 @@ func StartSlack(settings SlackSetting) (chan string, chan bool) {
 						}
 
 						output <- text
-						<-donechan
+						err := <-donechan
+						if err != nil {
+							slackAPI.UpdateMessage(
+								evi.Channel,
+								ts,
+								slack.MsgOptionAsUser(false),
+								slack.MsgOptionIconEmoji(settings.Icon),
+								slack.MsgOptionText(fmt.Sprintf("Error: %s", err.Error()), false),
+							)
+							continue
+						}
 
 						slackAPI.UpdateMessage(
 							evi.Channel,
