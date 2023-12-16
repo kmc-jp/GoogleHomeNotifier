@@ -1,6 +1,6 @@
 GoogleHome:
   Addr: 
-  Port: 
+  Port: 8009
   Detach: true
   ForceDetach: true
 
