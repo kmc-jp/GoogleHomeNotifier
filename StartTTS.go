@@ -21,7 +21,7 @@ func StartTTS(settings VoicevoxSetting) (chan string, chan TtsOutputAttr, error)
 		AccelerationMode: voicevox.VOICEVOX_ACCELERATION_MODE_AUTO,
 		CpuNumThreads:    0,
 		LoadAllModels:    false,
-		OpenJtalkDictDir: "open_jtalk_dic_utf_8-1.11",
+		OpenJtalkDictDir: settings.OpenJtalkDictDir,
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("Initialize: %v", err)
