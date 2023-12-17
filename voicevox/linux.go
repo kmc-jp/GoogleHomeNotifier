@@ -15,8 +15,6 @@ import (
 	"unsafe"
 )
 
-// ここにラッパー関数を定義
-
 func Initialize(options VoicevoxInitializeOptions) error {
 	cOptions := C.struct_VoicevoxInitializeOptions{
 		acceleration_mode:   C.VoicevoxAccelerationMode(options.AccelerationMode),
