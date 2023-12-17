@@ -18,7 +18,6 @@ This program is designed for letting Google Home Speak text which was sent from 
 export LD_LIBRARY_PATH=/path/to/so/directory:$LD_LIBRARY_PATH
 ```
 
-
 ## Settings
 
 ```yaml
@@ -27,6 +26,7 @@ GoogleHome:
   Port: 8009 # GoogleHome port number 
   Detach: true  # Optional
   ForceDetach: true # Optional
+  Volume: 0.5 # play volume
 
 Voicevox:
   SpeakerID: 3 
