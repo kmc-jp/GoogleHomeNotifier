@@ -1,4 +1,4 @@
-module github.com/TKMAX777/GoogleHomeNotifier
+module github.com/kmc-jp/GoogleHomeNotifier
 
 go 1.21.4
 
