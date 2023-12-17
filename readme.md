@@ -6,9 +6,9 @@ This program is designed for letting Google Home Speak text which was sent from 
 
 ## Install
 
-1. Clone this repository and compile it.
-2. Download VOICEVOX Core and Open JTalk dict (UTF-8)
-3. (Windows) Move every files in voicevox_core to the GoogleHomeNotifier binary directory
+1. Download VOICEVOX Core and Open JTalk dict (UTF-8)
+2. Clone this repository and compile it.
+3. Move every files in voicevox_core to the GoogleHomeNotifier binary directory
 4. Specify settings on `settings/settings.yaml`
 5. Start
 
