@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/TKMAX777/GoogleHomeNotifier/voicevox"
+	"github.com/kmc-jp/GoogleHomeNotifier/voicevox"
 )
 
 type TtsOutputAttr struct {
