@@ -46,6 +46,7 @@ func Play(sound TtsOutputAttr, settings GoogleHomeSetting) error {
 
 	select {
 	case <-timer.C:
+		app.StopMedia()
 		app.SetVolume(volume)
 		return fmt.Errorf("The message was too long, so it was interrupted.")
 	case <-stopchan:
