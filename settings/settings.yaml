@@ -1,14 +1,14 @@
-GoogleHome:
-  Addr: 
-  Port: 8009
-  Detach: true
-  ForceDetach: true
+# GoogleHome:
+#   Addr: # Google Home IP address
+#   Port: 8009 # GoogleHome port number 
+#   Detach: true  # Optional
+#   ForceDetach: true # Optional
 
-Voicevox:
-  SpeakerID: 3
-  OpenJtalkDictDir: "open_jtalk_dic_utf_8-1.11"
+# Voicevox:
+#   SpeakerID: 3 
+#   OpenJtalkDictDir: "open_jtalk_dic_utf_8-1.11" # You have to specify Open JTalk's dict path
 
-Slack:
-  Token:
-  AppLevelToken: 
-  Icon: 
+# Slack:
+#   Token: # Slack bot token, which has permissions of app_mentions:read, chat:write, and users:read, (and optinally, chat:write.customize)
+#   AppLevelToken: # Slack App level token, which has a scopeof connections:write.
+#   Icon: # (optional) icon emoji You can use this if you add chat:write.customize permission.
