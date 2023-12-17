@@ -31,6 +31,7 @@ type GoogleHomeSetting struct {
 	Port        int     `yaml:"Port"`
 	UUID        string  `yaml:"UUID"`
 	Volume      float32 `yaml:"Volume"`
+	MaxDuration float32 `yaml:"MaxDuration"`
 }
 
 type SlackSetting struct {

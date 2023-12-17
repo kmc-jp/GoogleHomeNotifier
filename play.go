@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/vishen/go-chromecast/application"
 )
@@ -34,9 +35,21 @@ func Play(sound TtsOutputAttr, settings GoogleHomeSetting) error {
 	if err != nil {
 		return fmt.Errorf("Load: %v", err)
 	}
-	app.MediaWait()
 
-	app.SetVolume(volume)
+	timer := time.NewTimer(time.Second * time.Duration(settings.MaxDuration))
+	stopchan := make(chan bool)
 
-	return nil
+	go func() {
+		app.MediaWait()
+		stopchan <- true
+	}()
+
+	select {
+	case <-timer.C:
+		app.SetVolume(volume)
+		return fmt.Errorf("The message was too long, so it was interrupted.")
+	case <-stopchan:
+		app.SetVolume(volume)
+		return nil
+	}
 }

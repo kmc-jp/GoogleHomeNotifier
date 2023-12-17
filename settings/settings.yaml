@@ -4,6 +4,7 @@
 #   Detach: true  # Optional
 #   ForceDetach: true # Optional
 #   Volume: 0.5
+#   MaxDuration: 5 # the message will be interrupted when this amount of time (in seconds) has passed
 
 # Voicevox:
 #   SpeakerID: 3 

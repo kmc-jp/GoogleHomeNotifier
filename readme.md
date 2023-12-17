@@ -31,6 +31,7 @@ GoogleHome:
 Voicevox:
   SpeakerID: 3 
   OpenJtalkDictDir: "open_jtalk_dic_utf_8-1.11" # You have to specify Open JTalk's dict path
+  MaxDuration: 5 # the message will be interrupted when this amount of time (in seconds) has passed
 
 Slack:
   Token: # Slack bot token, which has permissions of app_mentions:read, chat:write, and users:read, (and optinally, chat:write.customize)
