@@ -53,7 +53,8 @@ func StartSlack(settings SlackSetting) (chan string, chan error) {
 							slack.MsgOptionText("OK, wait a moment...", false),
 						)
 
-						text := strings.ReplaceAll(evi.Text, fmt.Sprintf("<@%s>", botinfo.BotID), "")
+						text := strings.ReplaceAll(evi.Text, fmt.Sprintf("<@%s>", botinfo.UserID), "")
+						text = strings.TrimSpace(text)
 
 						matchstrings := useridRegexp.FindAllStringSubmatch(text, -1)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 var DEBUG = os.Getenv("GOOGLE_HOME_DEBUG") == "on"
@@ -15,7 +16,7 @@ func main() {
 		return
 	}
 
-	ttsinput, ttsoutput, err := StartTTS(settings.Voicevox.SpeakerID, settings.Voicevox)
+	ttsinput, ttsoutput, err := StartTTS(settings.Voicevox)
 	if err != nil {
 		fmt.Println("Failed to StartTTS.", err)
 		return
@@ -25,14 +26,20 @@ func main() {
 
 	fmt.Println("Start waiting messages...")
 
+	var sound TtsOutputAttr
+
 	for text := range slacktextchan {
 		text = strings.TrimSpace(text)
 		if text == "" {
 			continue
 		}
 
+		if sound.FilePath != "" {
+			os.Remove(sound.FilePath)
+		}
+
 		ttsinput <- text
-		sound := <-ttsoutput
+		sound = <-ttsoutput
 
 		if sound.Error != nil {
 			slackdonechan <- fmt.Errorf("Failed to synthesize sound: %s", sound.Error)
@@ -45,7 +52,7 @@ func main() {
 			continue
 		}
 
-		os.Remove(sound.FilePath)
+		time.Sleep(time.Duration(sound.Duration) * time.Second)
 
 		slackdonechan <- nil
 	}

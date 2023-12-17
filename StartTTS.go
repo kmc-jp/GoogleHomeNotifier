@@ -10,10 +10,11 @@ import (
 
 type TtsOutputAttr struct {
 	FilePath string
+	Duration float64
 	Error    error
 }
 
-func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan TtsOutputAttr, error) {
+func StartTTS(settings VoicevoxSetting) (chan string, chan TtsOutputAttr, error) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
@@ -27,7 +28,7 @@ func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan Tts
 		return nil, nil, fmt.Errorf("Initialize: %v", err)
 	}
 
-	err = voicevox.LoadModel(speakerID)
+	err = voicevox.LoadModel(settings.SpeakerID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("LoadModel: %v", err)
 	}
@@ -53,9 +54,15 @@ func StartTTS(speakerID uint32, settings VoicevoxSetting) (chan string, chan Tts
 			f.Write(output)
 			f.Close()
 
+			duration, err := GetWavLength(f.Name())
+			if err != nil {
+				outputchan <- TtsOutputAttr{Error: fmt.Errorf("GetWavLength: %v", err)}
+				continue
+			}
+
 			voicevox.WavFree(output)
 
-			outputchan <- TtsOutputAttr{FilePath: f.Name()}
+			outputchan <- TtsOutputAttr{FilePath: f.Name(), Duration: duration}
 		}
 	}()
 

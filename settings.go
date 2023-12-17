@@ -22,14 +22,15 @@ type VoicevoxSetting struct {
 }
 
 type GoogleHomeSetting struct {
-	DeviceName  string `yaml:"DeviceName"`
-	Device      string `yaml:"Device"`
-	Iface       string `yaml:"Iface"`
-	ForceDetach bool   `yaml:"ForceDetach"`
-	Detach      bool   `yaml:"Detach"`
-	Addr        string `yaml:"Addr"`
-	Port        int    `yaml:"Port"`
-	UUID        string `yaml:"UUID"`
+	DeviceName  string  `yaml:"DeviceName"`
+	Device      string  `yaml:"Device"`
+	Iface       string  `yaml:"Iface"`
+	ForceDetach bool    `yaml:"ForceDetach"`
+	Detach      bool    `yaml:"Detach"`
+	Addr        string  `yaml:"Addr"`
+	Port        int     `yaml:"Port"`
+	UUID        string  `yaml:"UUID"`
+	Volume      float32 `yaml:"Volume"`
 }
 
 type SlackSetting struct {

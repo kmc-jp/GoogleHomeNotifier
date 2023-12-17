@@ -27,10 +27,14 @@ func Play(inputfile string, settings GoogleHomeSetting) error {
 		return fmt.Errorf("Start: %v", err)
 	}
 
+	volume := app.Volume().Level
+	app.SetVolume(settings.Volume)
+
 	err = app.Load(inputfile, 0, "audio/wav", false, settings.Detach, settings.ForceDetach)
 	if err != nil {
 		return fmt.Errorf("Load: %v", err)
 	}
 
+	app.SetVolume(volume)
 	return nil
 }
