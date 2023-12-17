@@ -10,7 +10,6 @@ import (
 
 type TtsOutputAttr struct {
 	FilePath string
-	Duration float64
 	Error    error
 }
 
@@ -54,15 +53,9 @@ func StartTTS(settings VoicevoxSetting) (chan string, chan TtsOutputAttr, error)
 			f.Write(output)
 			f.Close()
 
-			duration, err := GetWavLength(f.Name())
-			if err != nil {
-				outputchan <- TtsOutputAttr{Error: fmt.Errorf("GetWavLength: %v", err)}
-				continue
-			}
-
 			voicevox.WavFree(output)
 
-			outputchan <- TtsOutputAttr{FilePath: f.Name(), Duration: duration}
+			outputchan <- TtsOutputAttr{FilePath: f.Name()}
 		}
 	}()
 

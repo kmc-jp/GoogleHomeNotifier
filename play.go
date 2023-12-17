@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net"
-	"time"
 
 	"github.com/vishen/go-chromecast/application"
 )
@@ -35,9 +34,9 @@ func Play(sound TtsOutputAttr, settings GoogleHomeSetting) error {
 	if err != nil {
 		return fmt.Errorf("Load: %v", err)
 	}
-
-	time.Sleep(time.Duration(sound.Duration+0.5) * time.Second)
+	app.MediaWait()
 
 	app.SetVolume(volume)
+
 	return nil
 }
