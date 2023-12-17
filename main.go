@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 var DEBUG = os.Getenv("GOOGLE_HOME_DEBUG") == "on"
@@ -46,13 +45,11 @@ func main() {
 			continue
 		}
 
-		err = Play(sound.FilePath, settings.GoogleHome)
+		err = Play(sound, settings.GoogleHome)
 		if err != nil {
 			slackdonechan <- fmt.Errorf("Failed to play sound: %v", err)
 			continue
 		}
-
-		time.Sleep(time.Duration(sound.Duration) * time.Second)
 
 		slackdonechan <- nil
 	}

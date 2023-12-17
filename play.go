@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/vishen/go-chromecast/application"
 )
 
-func Play(inputfile string, settings GoogleHomeSetting) error {
+func Play(sound TtsOutputAttr, settings GoogleHomeSetting) error {
 	applicationOptions := []application.ApplicationOption{
 		application.WithDebug(DEBUG),
 	}
@@ -30,10 +31,12 @@ func Play(inputfile string, settings GoogleHomeSetting) error {
 	volume := app.Volume().Level
 	app.SetVolume(settings.Volume)
 
-	err = app.Load(inputfile, 0, "audio/wav", false, settings.Detach, settings.ForceDetach)
+	err = app.Load(sound.FilePath, 0, "audio/wav", false, settings.Detach, settings.ForceDetach)
 	if err != nil {
 		return fmt.Errorf("Load: %v", err)
 	}
+
+	time.Sleep(time.Duration(sound.Duration+0.5) * time.Second)
 
 	app.SetVolume(volume)
 	return nil

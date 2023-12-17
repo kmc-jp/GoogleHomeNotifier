@@ -3,7 +3,7 @@
 #   Port: 8009 # GoogleHome port number 
 #   Detach: true  # Optional
 #   ForceDetach: true # Optional
-#   Volume: 
+#   Volume: 0.5
 
 # Voicevox:
 #   SpeakerID: 3 
